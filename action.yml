@@ -37,4 +37,4 @@ inputs:
 
 runs:
   using: 'docker'
-  image: 'docker://ghcr.io/chipsalliance/verible-linter-action'
+  image: 'Dockerfile'
