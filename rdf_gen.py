@@ -19,13 +19,25 @@ class Fix:
 class ErrorMessage:
     def __init__(self, filename, line, column, message):
         self.filename = filename
-        self.line = line
-        self.column = column
+        if '-' in line:
+            lines = line.split('-')
+            self.line_start = int(lines[0])
+            self.line_end = int(lines[1])
+        else:
+            self.line_start = int(line)
+            self.line_end = int(line)
+        if "-" in column:
+            columns = column.split("-")
+            self.column_start = int(columns[0])
+            self.column_end = int(columns[1])
+        else:
+            self.column_start = int(column)
+            self.column_end = int(column)
         self.message = message
         self.suggestion = None
 
     def __repr__(self):
-        return f'{self.filename}:{self.line}:{self.column}: {self.message}'
+        return f"{self.filename}:{self.line_start}-{self.line_end}:{self.column_start}-{self.column_end}: {self.message}"
 
     def fix(self, suggestion):
         '''Adds a change suggestion to an existing ErrorMessage'''
@@ -44,7 +56,8 @@ class ErrorMessage:
             'location': {
                 'path': self.filename,
                 'range': {
-                    'start': {'line': self.line, 'column': self.column}
+                    'start': {'line': self.line_start, 'column': self.column_start},
+                    'end': {'line': self.line_end, 'column': self.column_end}
                 }
             },
             'severity': 'WARNING',
@@ -55,7 +68,7 @@ class ErrorMessage:
         if self.suggestion:
             result['suggestions'] = [{
                 'range': {
-                    'start': {'line': self.line, 'column': self.column},
+                    'start': {'line': self.line_start, 'column': self.column_end},
                     'end': {'line': self.suggestion.end_line}
                 },
                 'text': self.suggestion.text
@@ -115,7 +128,7 @@ def read_efm(filename):
         # now the data has 4 elements
         data = [elem.strip() for elem in data]
         messages.append(
-            ErrorMessage(data[0], int(data[1]), int(data[2]), data[3])
+            ErrorMessage(data[0], data[1], data[2], data[3])
         )
 
     return messages
