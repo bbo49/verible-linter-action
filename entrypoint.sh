@@ -57,6 +57,8 @@ fi
 
 echo "Running reviewdog"
 
+git config --global --add safe.directory $GITHUB_WORKSPACE
+
 "$GOBIN"/reviewdog -f=rdjson \
   -reporter="$INPUT_REVIEWDOG_REPORTER" \
   -fail-on-error="$INPUT_FAIL_ON_ERROR" \
